@@ -44,7 +44,7 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="mt-auto pt-16 pb-8">
+      {/* <footer className="mt-auto pt-16 pb-8">
         <div className="text-center">
           <a
             href="https://www.youtube.com/c/codinginflow"
@@ -55,7 +55,7 @@ export default function Home() {
             Full tutorial on YouTube →
           </a>
         </div>
-      </footer>
+      </footer> */}
     </div>
   );
 }

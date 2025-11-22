@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
+import { ConvexClientProvider } from "./convex-client-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,7 +26,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.className} antialiased`}>
-        {children}
+        <ConvexClientProvider>
+          {children}
+        </ConvexClientProvider>
         <Toaster position="top-right" />
       </body>
     </html>
