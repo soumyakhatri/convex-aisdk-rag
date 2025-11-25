@@ -1,5 +1,5 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { internalMutation, mutation, query } from "./_generated/server";
+import { internalMutation, internalQuery, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 
 export const createNoteWithEmbeddings = internalMutation({
@@ -85,3 +85,83 @@ export const deleteNote = mutation({
         }
     },
 })
+
+// export const findNotesByEmbeddingIds = internalQuery({
+//     args: {
+//         embeddingsIds: v.array(v.id("noteEmbeddings"))
+//     },
+//     handler: async (ctx, args) => {
+//         const embeddings = []
+//         for (const id of args.embeddingsIds) {
+//             const embeddingData = await ctx.db.get(id)
+//             if (embeddingData !== null) {
+//                 embeddings.push(embeddingData)
+//             }
+//         }
+//         const uniqueNoteIds = [
+//             ...new Set(embeddings.map(embedding => embedding.noteId))
+//         ]
+
+//         const notes = []
+//         for (const noteId of uniqueNoteIds) {
+//             const note = await ctx.db.get(noteId)
+//             if (note !== null) {
+//                 notes.push(note)
+//             }
+//         }
+//         return notes
+//     },
+// })
+
+// export const findNotesByEmbeddingIds = internalQuery({
+//   args: {
+//     embeddingsIds: v.array(v.id("noteEmbeddings")),
+//   },
+//   handler: async (ctx, args) => {
+
+//     // Fetch all embeddings in one call
+//     const embeddings = await ctx.db.getMany(args.embeddingsIds);
+
+//     const uniqueNoteIds = [
+//       ...new Set(
+//         embeddings
+//           .filter(e => e !== null)
+//           .map(e => e.noteId)
+//       )
+//     ];
+
+//     // Fetch notes in one call
+//     const notes = await ctx.db.getMany(uniqueNoteIds);
+
+//     return notes.filter(n => n !== null);
+//   }
+// });
+
+export const findNotesByEmbeddingIds = internalQuery({
+  args: {
+    embeddingsIds: v.array(v.id("noteEmbeddings")),
+  },
+  handler: async (ctx, args) => {
+
+    // Fetch all embeddings in parallel
+    const embeddings = await Promise.all(
+      args.embeddingsIds.map(id => ctx.db.get(id))
+    );
+
+    const uniqueNoteIds = [
+      ...new Set(
+        embeddings
+          .filter(e => e !== null)
+          .map(e => e.noteId)
+      )
+    ];
+
+    // Fetch all notes in parallel
+    const notes = await Promise.all(
+      uniqueNoteIds.map(id => ctx.db.get(id))
+    );
+
+    return notes.filter(n => n !== null);
+  }
+});
+

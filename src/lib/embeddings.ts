@@ -22,5 +22,10 @@ export const generateEmbeddings = async (input: string): Promise<Array<{ content
     }))
 }
 
-
-
+export const generateEmbedding = async (value: string): Promise<number[]> => {
+    const { embedding } = await embed({
+        model: openai.embedding("text-embedding-3-small"),
+        value
+    })
+    return embedding
+}
